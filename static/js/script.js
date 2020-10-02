@@ -168,6 +168,22 @@ let blackjackGame = {
     div: "#dealer-box",
     score: 0,
   },
+  cards: ["2", "3", "4", "5", "6", "7", "8", "9", "10", "K", "Q", "J", "A"],
+  cardsMap: {
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
+    9: 9,
+    10: 10,
+    K: 10,
+    J: 10,
+    Q: 10,
+    A: [1, 11],
+  },
 };
 
 const YOU = blackjackGame["you"];
@@ -176,7 +192,7 @@ const DEALER = blackjackGame["dealer"];
 const hitSound = new Audio("static/sounds/swish.m4a");
 
 document
-  .getElementById("blackjack-hit-button")
+  .querySelector("#blackjack-hit-button")
   .addEventListener("click", blackjackHit);
 
 document
@@ -184,17 +200,56 @@ document
   .addEventListener("click", blackjackDeal);
 
 function blackjackHit() {
-  showCard(YOU);
+  let card = randomCard();
+  showCard(card, YOU);
+  updateScore(card, YOU);
+  showScore(YOU);
+}
+function randomCard() {
+  let randomIndex = Math.floor(Math.random() * 13);
+  return blackjackGame.cards[randomIndex];
 }
 
-function showCard(activePlayer) {
+function showCard(card, activePlayer) {
   let cardImage = document.createElement("img");
-  cardImage.src = "static/images/Q.png";
+  cardImage.src = `static/images/${card}.png`;
   document.querySelector(activePlayer["div"]).appendChild(cardImage);
   hitSound.play();
 }
 
 function blackjackDeal() {
   let yourImages = document.querySelector("#your-box").querySelectorAll("img");
-  console.log(yourImages);
+  let dealerImages = document
+    .querySelector("#dealer-box")
+    .querySelectorAll("img");
+
+  let yourScore = document.querySelector("#your-blackjack-result");
+  yourScore.innerHTML = 0;
+  YOU.score = 0;
+  for (i = 0; i < yourImages.length; i++) {
+    yourImages[i].remove();
+  }
+
+  for (i = 0; i < dealerImages.length; i++) {
+    dealerImages[i].remove();
+  }
+}
+
+function updateScore(card, activePlayer) {
+  if (card === "A") {
+    //if adding 11 keeps me  below 21, add 11 otherwise, add 1
+
+    if (activePlayer["score"] + blackjackGame["cardsMap"][card][1] <= 21) {
+      activePlayer["score"] += blackjackGame["cardsMap"][card][1];
+    } else {
+      activePlayer["score"] += blackjackGame["cardsMap"][card][0];
+    }
+  } else {
+    activePlayer["score"] += blackjackGame["cardsMap"][card];
+  }
+}
+
+function showScore(activePlayer) {
+  document.querySelector(activePlayer["scoreSpan"]).textContent =
+    activePlayer["score"];
 }
