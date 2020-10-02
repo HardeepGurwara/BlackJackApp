@@ -211,10 +211,12 @@ function randomCard() {
 }
 
 function showCard(card, activePlayer) {
-  let cardImage = document.createElement("img");
-  cardImage.src = `static/images/${card}.png`;
-  document.querySelector(activePlayer["div"]).appendChild(cardImage);
-  hitSound.play();
+  if (activePlayer["score"] <= 21) {
+    let cardImage = document.createElement("img");
+    cardImage.src = `static/images/${card}.png`;
+    document.querySelector(activePlayer["div"]).appendChild(cardImage);
+    hitSound.play();
+  }
 }
 
 function blackjackDeal() {
@@ -224,8 +226,6 @@ function blackjackDeal() {
     .querySelectorAll("img");
 
   let yourScore = document.querySelector("#your-blackjack-result");
-  yourScore.innerHTML = 0;
-  YOU.score = 0;
   for (i = 0; i < yourImages.length; i++) {
     yourImages[i].remove();
   }
@@ -233,6 +233,14 @@ function blackjackDeal() {
   for (i = 0; i < dealerImages.length; i++) {
     dealerImages[i].remove();
   }
+
+  YOU["score"] = 0;
+  DEALER["score"] = 0;
+
+  document.querySelector("#your-blackjack-result").textContent = 0;
+  document.querySelector("#dealer-blackjack-result").textContent = 0;
+  document.querySelector("#your-blackjack-result").style.color = "#ffffff";
+  document.querySelector("#dealer-blackjack-result").style.color = "#ffffff";
 }
 
 function updateScore(card, activePlayer) {
@@ -250,6 +258,11 @@ function updateScore(card, activePlayer) {
 }
 
 function showScore(activePlayer) {
-  document.querySelector(activePlayer["scoreSpan"]).textContent =
-    activePlayer["score"];
+  if (activePlayer["score"] > 21) {
+    document.querySelector(activePlayer["scoreSpan"]).textContent = "BUST";
+    document.querySelector(activePlayer["scoreSpan"]).style.color = "red";
+  } else {
+    document.querySelector(activePlayer["scoreSpan"]).textContent =
+      activePlayer["score"];
+  }
 }
